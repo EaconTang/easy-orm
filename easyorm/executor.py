@@ -63,6 +63,18 @@ class TableExecutor(object):
         """仅返回SQL语句"""
         return self._sql
 
+    def _execute_one(self):
+        # ToDo
+        self.check()
+        with self._conn.cursor() as _cursor:
+            _cursor.execute(self._sql)
+
+    def _execute_many(self):
+        # ToDo
+        self.check()
+        with self._conn.cursor() as _cursor:
+            _cursor.executemany()
+
     @property
     def result(self):
         """SELECT的查询结果集"""
@@ -75,10 +87,13 @@ class TableExecutor(object):
             res = []
         return res
 
-    def next(self):
-        res = self.result
-        for r in res:
-            yield r
+    def result_next(self):
+        # ToDo
+        raise NotImplementedError
+
+    def result_many(self, size):
+        # ToDo
+        raise NotImplementedError
 
     def commit(self):
         """提交UPDATE/INSERT的操作"""
