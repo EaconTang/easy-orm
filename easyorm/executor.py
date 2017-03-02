@@ -159,27 +159,41 @@ class TableExecutor(object):
         return self
 
     def _where(self, and_or, **kwargs):
+        # ToDo:需要支持like子句
+        """
+        :param and_or:
+        :param kwargs:
+        :return:
+        """
         if kwargs:
-            self._sql += ''
-
-            self._sql += """WHERE {0}""".format(
+            self._sql += """ WHERE {0}""".format(
                 ' {} '.format(and_or).join(['{0}={1}'.format(k, v) for k, v in kwargs.iteritems()])
             )
-        else:
-            pass
         return self
 
-    def and_where(self, **kwargs):
+    def where_and(self, **kwargs):
         """条件查询，AND查询"""
         return self._where('AND', **kwargs)
 
-    def or_where(self, **kwargs):
+    def where_or(self, **kwargs):
         """条件查询，OR查询"""
         return self._where('OR', **kwargs)
 
     def where(self, **kwargs):
         """条件查询，默认AND查询"""
-        return self.and_where(**kwargs)
+        return self.where_and(**kwargs)
+
+    def sortby(self, *args, **kwargs):
+        """排序字段"""
+        if args:
+            self._sql += """ ORDER BY {}""".format(
+                ', '.join(args)
+            )
+            if kwargs:
+                desc = kwargs.get('desc', False)
+                if desc:
+                    self._sql += ' DESC'
+        return self
 
     def type_str(self, _str):
         """
@@ -214,10 +228,10 @@ if __name__ == '__main__':
     conn = get_mysql_conn('10.17.35.80', 'root', 'horuseye', 'horuseye8888')
     te = TableExecutor(conn, 'tsd_alert')
 
-    print te.query('alert_id', 'alert_metric').statement
+    print te.query('alert_id', 'alert_metric').sortby('id', 'name', desc=True).statement
 
     print te.insert(alert_metric='eacon', alert_id=604, alert_info='!!!').statement
 
-    print te.update(alert_metric='tyk').or_where(alert_id=604, alert_name='test').statement
+    print te.update(alert_metric='tyk').where(alert_id=604, alert_name='test').statement
 
     print te.delete().where(alert_id=604).statement
