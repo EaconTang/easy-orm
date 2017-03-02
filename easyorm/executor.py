@@ -22,7 +22,7 @@ class TableExecutor(object):
         >>> t1.insert(name='eacon', id=3).commit()
         True
 
-        >>> t1.update(role='user').where(name='eacon).statement
+        >>> t1.update(role='user').where(name='eacon').statement
         UPDATE table_1 SET role="user" WHERE name="eacon"
 
         >>> t1.delete().where(id=4).commit()
@@ -69,7 +69,7 @@ class TableExecutor(object):
         with self._conn.cursor() as _cursor:
             _cursor.execute(self._sql)
 
-    def _execute_many(self):
+    def _execute_many(self, *values):
         # ToDo
         self.check()
         with self._conn.cursor() as _cursor:
@@ -132,6 +132,13 @@ class TableExecutor(object):
             raise Exception('Kwargs should not be bull!')
         return self
 
+    def insert_many(self, **kwargs):
+        """
+        TableExecutor.insert_many(col1=(*list), col2=(*list))
+        :param kwargs:
+        :return:
+        """
+
     def update(self, **kwargs):
         """TableExecutor.update(col1='..', col2='..').where(cond1='...', cond2=...)"""
         self.clear()
@@ -151,16 +158,28 @@ class TableExecutor(object):
         self._sql = """DELETE FROM {0}""".format(self._table)
         return self
 
-    def where(self, **kwargs):
-        """条件查询"""
+    def _where(self, and_or, **kwargs):
         if kwargs:
-            self._sql += ' '
+            self._sql += ''
+
             self._sql += """WHERE {0}""".format(
-                ' AND '.join(['{0}={1}'.format(k, v) for k, v in kwargs.iteritems()])
+                ' {} '.format(and_or).join(['{0}={1}'.format(k, v) for k, v in kwargs.iteritems()])
             )
         else:
             pass
         return self
+
+    def and_where(self, **kwargs):
+        """条件查询，AND查询"""
+        return self._where('AND', **kwargs)
+
+    def or_where(self, **kwargs):
+        """条件查询，OR查询"""
+        return self._where('OR', **kwargs)
+
+    def where(self, **kwargs):
+        """条件查询，默认AND查询"""
+        return self.and_where(**kwargs)
 
     def type_str(self, _str):
         """
@@ -199,6 +218,6 @@ if __name__ == '__main__':
 
     print te.insert(alert_metric='eacon', alert_id=604, alert_info='!!!').statement
 
-    print te.update(alert_metric='tyk').where(alert_id=604).statement
+    print te.update(alert_metric='tyk').or_where(alert_id=604, alert_name='test').statement
 
     print te.delete().where(alert_id=604).statement
