@@ -206,36 +206,40 @@ class TableExecutor(object):
 
     def cmp_str(self, v):
         """
-        WHERE子句中的字段kv比较符，=, <, >, IS...
+        WHERE子句中的字段kv比较符，=, <, >, IS, REGEXP...
         :param self:
         :return:
         """
-        if v in (IsNull, NotNUll):
+        if isinstance(v, (IsNull, NotNUll)):
             return " IS "
+        elif isinstance(v, Regexp):
+            return " REGEXP "
         else:
             return "="
 
-    def value_str(self, _str):
+    def value_str(self, _val):
         """
         在INSERT、UPDATE语句中：
             如果值是整形，只需转换为字符串返回；
             如果值是字符串，需要加单/双引号；
             如果值是自定义的Timestamp类型，需要转换为时间格式并且加引号
-        :param _str:
+        :param _val:
         :return:
         """
-        if isinstance(_str, (int, float, long)):
-            return str(_str)
-        if isinstance(_str, basestring):
-            return '"{0}"'.format(self.escape_sql(_str))
-        if isinstance(_str, Timestamp):
-            return '"{0}"'.format(_str.datetime_str)
-        if issubclass(_str, IsNull):
+        if isinstance(_val, (int, float, long)):
+            return str(_val)
+        if isinstance(_val, basestring):
+            return '"{0}"'.format(self.escape_sql(_val))
+        if isinstance(_val, Timestamp):
+            return '"{0}"'.format(_val.datetime_str)
+        if isinstance(_val, Regexp):
+            return '"{0}"'.format(_val.expression)
+        if isinstance(_val, IsNull):
             return 'NULL'
-        if issubclass(_str, NotNUll):
+        if isinstance(_val, NotNUll):
             return 'NOT NULL'
         else:
-            return str(_str)
+            return str(_val)
 
     def escape_sql(self, text):
         """对于字符串的值，如果里面有单/双引号，需要转义"""
@@ -270,6 +274,6 @@ if __name__ == '__main__':
 
     print te.insert(alert_metric='eacon', alert_id=604, alert_info='!!!').statement
 
-    print te.update(alert_metric='tyk').where(alert_id='604', alert_name=NotNUll, alertInfo=IsNull).statement
+    print te.update(alert_metric='tyk').where(alert_id='604', alert_name=NotNUll(), alertInfo=IsNull()).statement
 
-    print te.delete().where(alert_id=604).statement
+    print te.delete().where(alert_id=Regexp('^a\d{2}')).statement

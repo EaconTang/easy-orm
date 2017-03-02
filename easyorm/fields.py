@@ -40,6 +40,16 @@ class Timestamp(MysqlField):
         return '<Timestamp: {0}|{1}>'.format(self._timestamp, self.datetime_str)
 
 
+class Regexp(MysqlField):
+    """正则表达式"""
+    def __init__(self, exp):
+        self._exp = exp
+
+    @property
+    def expression(self):
+        return self._exp
+
+
 class NullField(MysqlField):
     """"""
 
