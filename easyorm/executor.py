@@ -1,7 +1,7 @@
 # coding=utf-8
 import time
 
-from fields import Timestamp
+from fields import *
 
 
 class TableExecutor(object):
@@ -122,7 +122,7 @@ class TableExecutor(object):
         self.clear()
         if kwargs:
             keys = kwargs.keys()
-            values = [self.type_str(kwargs.get(key)) for key in keys]
+            values = [self.value_str(kwargs.get(key)) for key in keys]
             self._sql += """INSERT INTO {0} ({1}) VALUES ({2})""".format(
                 self._table,
                 ', '.join(keys),
@@ -143,7 +143,7 @@ class TableExecutor(object):
         """TableExecutor.update(col1='..', col2='..').where(cond1='...', cond2=...)"""
         self.clear()
         if kwargs:
-            kv_list = ['{0}={1}'.format(k, self.type_str(v)) for k, v in kwargs.iteritems()]
+            kv_list = ['{0}={1}'.format(k, self.value_str(v)) for k, v in kwargs.iteritems()]
             self._sql += """UPDATE {0} SET {1}""".format(
                 self._table,
                 ', '.join(kv_list)
@@ -167,7 +167,8 @@ class TableExecutor(object):
         """
         if kwargs:
             self._sql += """ WHERE {0}""".format(
-                ' {} '.format(and_or).join(['{0}={1}'.format(k, v) for k, v in kwargs.iteritems()])
+                ' {} '.format(and_or).join(
+                    ['{0}{1}{2}'.format(k, self.cmp_str(v), self.value_str(v)) for k, v in kwargs.iteritems()])
             )
         return self
 
@@ -203,7 +204,18 @@ class TableExecutor(object):
             )
         return self
 
-    def type_str(self, _str):
+    def cmp_str(self, v):
+        """
+        WHERE子句中的字段kv比较符，=, <, >, IS...
+        :param self:
+        :return:
+        """
+        if v in (IsNull, NotNUll):
+            return " IS "
+        else:
+            return "="
+
+    def value_str(self, _str):
         """
         在INSERT、UPDATE语句中：
             如果值是整形，只需转换为字符串返回；
@@ -218,6 +230,10 @@ class TableExecutor(object):
             return '"{0}"'.format(self.escape_sql(_str))
         if isinstance(_str, Timestamp):
             return '"{0}"'.format(_str.datetime_str)
+        if issubclass(_str, IsNull):
+            return 'NULL'
+        if issubclass(_str, NotNUll):
+            return 'NOT NULL'
         else:
             return str(_str)
 
@@ -227,6 +243,20 @@ class TableExecutor(object):
 
     def clear(self):
         """clear sql statement"""
+        self._sql = ''
+
+
+class MultiTableExecutor(object):
+    """
+    多表查询
+    构造每个表的sql语句字典，进行组合？
+    """
+
+    # ToDo
+
+    def __init__(self, conn=None, tables=None):
+        self._conn = conn
+        self._tables = tables
         self._sql = ''
 
 
@@ -240,6 +270,6 @@ if __name__ == '__main__':
 
     print te.insert(alert_metric='eacon', alert_id=604, alert_info='!!!').statement
 
-    print te.update(alert_metric='tyk').where(alert_id=604, alert_name='test').statement
+    print te.update(alert_metric='tyk').where(alert_id='604', alert_name=NotNUll, alertInfo=IsNull).statement
 
     print te.delete().where(alert_id=604).statement

@@ -2,9 +2,14 @@
 """
 自定义的数据类型，对应Myslq字段类型
 """
+import time
 
 
-class Timestamp(object):
+class MysqlField(object):
+    """自定义的数据类型，对应Myslq字段类型"""
+
+
+class Timestamp(MysqlField):
     """
     时间戳数据类型
     更新数据时，Mysql的TIMESTAMP字段，可以通过这个对象来赋予时间戳
@@ -33,3 +38,17 @@ class Timestamp(object):
 
     def __str__(self):
         return '<Timestamp: {0}|{1}>'.format(self._timestamp, self.datetime_str)
+
+
+class NullField(MysqlField):
+    """"""
+
+
+class IsNull(NullField):
+    """
+    NULL值
+    """
+
+
+class NotNUll(NullField):
+    """NOT NULL值"""
