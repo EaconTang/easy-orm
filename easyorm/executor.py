@@ -195,6 +195,14 @@ class TableExecutor(object):
                     self._sql += ' DESC'
         return self
 
+    def groupby(self, *args):
+        """分组字段"""
+        if args:
+            self._sql += """ GROUP BY {}""".format(
+                ', '.join(args)
+            )
+        return self
+
     def type_str(self, _str):
         """
         在INSERT、UPDATE语句中：
@@ -228,7 +236,7 @@ if __name__ == '__main__':
     conn = get_mysql_conn('10.17.35.80', 'root', 'horuseye', 'horuseye8888')
     te = TableExecutor(conn, 'tsd_alert')
 
-    print te.query('alert_id', 'alert_metric').sortby('id', 'name', desc=True).statement
+    print te.query('alert_id', 'alert_metric').sortby('id', 'name', desc=True).groupby('name').statement
 
     print te.insert(alert_metric='eacon', alert_id=604, alert_info='!!!').statement
 
