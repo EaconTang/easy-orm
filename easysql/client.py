@@ -5,7 +5,7 @@ from queue import Queue
 
 import pymysql
 
-from easyorm.utils import *
+from easysql.utils import *
 
 
 @singleton

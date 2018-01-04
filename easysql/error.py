@@ -1,16 +1,16 @@
-class EasyORMError(Exception):
+class EasySQLError(Exception):
     """"""
 
 
-class ConnectionFail(EasyORMError):
+class ConnectionFail(EasySQLError):
     """"""
 
 
-class NetworkFail(EasyORMError):
+class NetworkFail(EasySQLError):
     """"""
 
 
-class DBError(EasyORMError):
+class DBError(EasySQLError):
     """"""
 
 

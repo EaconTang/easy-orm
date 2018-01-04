@@ -1,7 +1,7 @@
 from setuptools import setup
 
 VERSION = '0.0.1'
-DESCRIPTION = "EasyORM: A simple orm implementation"
+DESCRIPTION = "EasySQL: A simple SQL constructor"
 LONG_DESCRIPTION = open('README.md').read()
 
 CLASSIFIERS = filter(None, map(str.strip,
@@ -17,19 +17,19 @@ Topic :: Software Development :: Libraries :: Python Modules
 """.splitlines()))
 
 setup(
-    name="easyorm",
+    name="easysql",
     version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     classifiers=CLASSIFIERS,
-    keywords=('mysql', 'orm', 'databse'),
+    keywords=('mysql', 'sql', 'databse'),
     author="Eacon Tang",
     author_email="tyingk@163.com",
-    url="https://github.com/EaconTang/easy-orm",
+    url="https://github.com/EaconTang/easy-sql",
     license="MIT License",
     platforms=['any'],
     test_suite="",
     zip_safe=True,
     install_requires=['PyMySQL==0.7.9'],
-    packages=['easyorm']
+    packages=['easysql']
 )

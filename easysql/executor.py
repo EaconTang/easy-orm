@@ -1,7 +1,7 @@
 # coding=utf-8
 import time
 
-from fields import *
+from easysql.fields import *
 
 
 class TableExecutor(object):
@@ -105,7 +105,6 @@ class TableExecutor(object):
             SUCCESS = True
         except Exception as e:
             SUCCESS = False
-            print e.message
         return SUCCESS
 
     def query(self, *args):
@@ -265,7 +264,7 @@ class MultiTableExecutor(object):
 
 
 if __name__ == '__main__':
-    from client import get_mysql_conn
+    from easysql.client import get_mysql_conn
 
     conn = get_mysql_conn('10.17.35.80', 'root', 'horuseye', 'horuseye8888')
     te = TableExecutor(conn, 'tsd_alert')
