@@ -1,9 +1,10 @@
 ## ORM简易实现
 
-一个简易可用的Mysql表的增删改查执行器，屏蔽SQL语法复杂度  
+一个简易可用的Mysql表的增删改查执行器，屏蔽SQL语法复杂度
+  
     基本用法:
     
-        >>> conn = get_mysql_conn()
+        >>> conn = get_mysql_conn(host, port, user, password, db, charset, timeout, auto_commit，**kwargs)
         >>> t1 = TableExecutor(conn, 'table_1')
 
         # 查询, result属性返回结果集，statement属性查看SQL语句
@@ -26,3 +27,17 @@
         # 修改数据表名或连接对象
         >>> te.table = 'table-name'
         >>> te.conn = MysqlConnection
+        
+    
+   自带实现线程安全的连接池：
+   
+       class ThreadSafeConnectionPool(ConnectionPool):
+        """线程安全的连接池，每个线程使用同一个连接
+        >>> flag_success, origin_pool = connection_pool(**kwargs)
+        >>> if flag_success:
+        >>>     pool = ThreadSafeConnectionPool(origin_pool)
+        >>> pool.register_me()      # 线程注册(可选，通过上下文进入时会自动注册）
+        >>> with pool as conn:
+        >>>     conn.cursor()       # 返回当前线程专属的连接
+        >>>
+        """
