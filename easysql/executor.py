@@ -264,15 +264,4 @@ class MultiTableExecutor(object):
 
 
 if __name__ == '__main__':
-    from easysql.client import get_mysql_conn
-
-    conn = get_mysql_conn('10.17.35.80', 'root', 'horuseye', 'horuseye8888')
-    te = TableExecutor(conn, 'tsd_alert')
-
-    print te.query('alert_id', 'alert_metric').sortby('id', 'name', desc=True).groupby('name').statement
-
-    print te.insert(alert_metric='eacon', alert_id=604, alert_info='!!!').statement
-
-    print te.update(alert_metric='tyk').where(alert_id='604', alert_name=NotNUll(), alertInfo=IsNull()).statement
-
-    print te.delete().where(alert_id=Regexp('^a\d{2}')).statement
+    pass
